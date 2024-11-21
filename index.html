@@ -122,9 +122,24 @@ $(document).ready(function() {
                     // Handle the response from the server
                     $('#responseMessage').html('<p style="color: green;">' + response + '</p>');
                 },
-                error: function() {
-                    // Handle any errors
-                    $('#responseMessage').html('<p style="color: red;">An error occurred while submitting the form. Please try again.</p>');
+                error: function(xhr) {
+                    // Parse the error response
+                    var errors = xhr.responseJSON.errors;
+
+                    // Loop through all form fields and display error messages
+                    $.each(errors, function(field, messages) {
+                        // Check if the field exists and place error message
+                        $('#' + field).addClass('is-invalid');  // Add invalid class for styling
+                        $('#' + field).siblings('.invalid-feedback').remove();  // Remove previous messages
+                        
+                        // Create a new error message element and append it next to the field
+                        $.each(messages, function(index, message) {
+                            $('#' + field).after('<div class="invalid-feedback">' + message + '</div>');
+                        });
+                    });
+
+                    // Optionally, display a general error message
+                    $('#responseMessage').html('<p style="color: red;">An error occurred while submitting the form. Please check the fields and try again.</p>');
                 }
             });
         }
